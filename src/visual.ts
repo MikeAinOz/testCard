@@ -53,32 +53,7 @@ export class Visual implements IVisual {
         this.updateCount = 0;
         this.cardLoad = false;
         this.cardGet = false;
-        var card = {
-            "type": "AdaptiveCard",
-            "version": "1.0",
-            "body": [
-                {
-                    "type": "Image",
-                    "url": "https://adaptivecards.io/content/adaptive-card-50.png"
-                },
-                {
-                    "type": "TextBlock",
-                    "text": "Hello **Adaptive Cards!**"
-                }
-            ],
-            "actions": [
-                {
-                    "type": "Action.OpenUrl",
-                    "title": "Learn more",
-                    "url": "https://adaptivecards.io"
-                },
-                {
-                    "type": "Action.OpenUrl",
-                    "title": "GitHub",
-                    "url": "https://github.com/Microsoft/AdaptiveCards"
-                }
-            ]
-        };
+
 
         if (document) {
             const new_p: HTMLElement = document.createElement("p");
@@ -88,44 +63,12 @@ export class Visual implements IVisual {
             new_em.appendChild(this.textNode);
             new_p.appendChild(new_em);
             this.target.appendChild(new_p);
-            /*
-            var renderedCard;
-            // Create an AdaptiveCard instance
-            var adaptiveCard = new AdaptiveCards.AdaptiveCard();
-
-            // Set its hostConfig property unless you want to use the default Host Config
-            // Host Config defines the style and behavior of a card
-            adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
-                fontFamily: "Segoe UI, Helvetica Neue, sans-serif"
-                // More host config options
-            });
-
-            // Set the adaptive card's event handlers. onExecuteAction is invoked
-            // whenever an action is clicked in the card
-            adaptiveCard.onExecuteAction = function (action) { console.log(adaptiveCard.toJSON()) }
-
-            // For markdown support you need a third-party library
-            // E.g., to use markdown-it, include in your HTML page:
-            //     <script type="text/javascript" src="https://unpkg.com/markdown-it/dist/markdown-it.js"></script>
-            // And add this code to replace the default markdown handler:
-            //     AdaptiveCards.processMarkdown = function(text) { return markdownit().render(text); }
-
-            // Parse the card payload
-
-            adaptiveCard.parse(card);
-
-            // Render the card to an HTML element:
-            console.log("Render Card")
-            renderedCard = adaptiveCard.render();
-
-            // And finally insert it somewhere in your page:
-            this.target.appendChild(renderedCard);
-            */
-           this.loadCard(this.target,card);
+            this.getCard(this.target, "https://paradigmdownload.blob.core.windows.net/pbiviz/AdaptiveCards/simpletest.json");
+            //this.loadCard(this.target,card);
 
         }
 
-        
+
     }
 
     public update(options: VisualUpdateOptions) {
@@ -138,7 +81,7 @@ export class Visual implements IVisual {
 
             console.log("Get web page");
             this.cardLoad = true;
-           // this.getCard(this.target,this.settings.sourceUrl.sourceUrl);
+            // this.getCard(this.target,this.settings.sourceUrl.sourceUrl);
 
         }
     }
@@ -155,22 +98,41 @@ export class Visual implements IVisual {
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
     }
-    public getCard(target: HTMLElement,url: string) {
+    public getCard(target: HTMLElement, url: string) {
         // using XMLHttpRequest
+        /*
         let xhr = new XMLHttpRequest();
-       // let loadCard = this.loadCard;
+        let loadCard = this.loadCard;
         xhr.open("GET", this.settings.sourceUrl.sourceUrl, true);
         xhr.onload = function () {   
-            //target.appendChild(document.createTextNode("Load Card"));        
+          target.appendChild(document.createTextNode("Load Card"));        
           //  loadCard(target,xhr.responseText);
+          console.log("Got the Card")
+          loadCard(target,card);
         }
         xhr.onerror = function () {
            // loadCard(target,"Document not loaded, check Url");
         }
         xhr.send();
+        */
+        var xhttp = new XMLHttpRequest();
+        let loadCard = this.loadCard;
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                // Typical action to be performed when the document is ready:
+                //document.getElementById("demo").innerHTML = xhttp.responseText;
+                target.appendChild(document.createTextNode("Card Loaded")); 
+                let card = JSON.parse(xhttp.responseText) ;
+                loadCard(target,card);
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.send();
+
+        //this.loadCard(target,card);
     }
-    public loadCard(target: HTMLElement, card){
-        target.appendChild(document.createTextNode(card));
+    public loadCard(target: HTMLElement, card) {
+
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
         adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
             fontFamily: "Segoe UI, Helvetica Neue, sans-serif"
