@@ -88,6 +88,7 @@ export class Visual implements IVisual {
             new_em.appendChild(this.textNode);
             new_p.appendChild(new_em);
             this.target.appendChild(new_p);
+            /*
             var renderedCard;
             // Create an AdaptiveCard instance
             var adaptiveCard = new AdaptiveCards.AdaptiveCard();
@@ -119,6 +120,8 @@ export class Visual implements IVisual {
 
             // And finally insert it somewhere in your page:
             this.target.appendChild(renderedCard);
+            */
+           this.loadCard(this.target,card);
 
         }
 
@@ -155,18 +158,18 @@ export class Visual implements IVisual {
     public getCard(target: HTMLElement,url: string) {
         // using XMLHttpRequest
         let xhr = new XMLHttpRequest();
-        let loadCard = this.loadCard;
+       // let loadCard = this.loadCard;
         xhr.open("GET", this.settings.sourceUrl.sourceUrl, true);
         xhr.onload = function () {   
             //target.appendChild(document.createTextNode("Load Card"));        
-            loadCard(target,xhr.responseText);
+          //  loadCard(target,xhr.responseText);
         }
         xhr.onerror = function () {
-            loadCard(target,"Document not loaded, check Url");
+           // loadCard(target,"Document not loaded, check Url");
         }
         xhr.send();
     }
-    public loadCard(target: HTMLElement, card: string){
+    public loadCard(target: HTMLElement, card){
         target.appendChild(document.createTextNode(card));
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
         adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
@@ -179,7 +182,7 @@ export class Visual implements IVisual {
         // Render the card to an HTML element:
         console.log("Render Card")
         var renderedCard = adaptiveCard.render();
-        console.log(renderedCard);
+        //console.log(renderedCard);
 
         // And finally insert it somewhere in your page:
         target.appendChild(renderedCard);
